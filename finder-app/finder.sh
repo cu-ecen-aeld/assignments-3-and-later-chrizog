@@ -19,7 +19,6 @@ number_files=0
 for file in $(find $filesdir -type f);do
     file_counted=false
     while IFS= read -r line; do
-        #echo "Text read from file: $line"
         if [[ "${line}" == "${searchstr}" ]]; then
             number_lines=$((number_lines + 1))
 
