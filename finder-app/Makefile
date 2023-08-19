@@ -6,4 +6,6 @@ writer:	writer.c
 		$(COMPILER) -o writer writer.c
 
 clean:	
-		rm writer
+		@if [ -e writer ]; then \
+			rm writer; \
+		fi
