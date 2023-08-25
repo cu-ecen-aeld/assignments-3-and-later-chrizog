@@ -1,4 +1,4 @@
-CROSS_COMPILE := x86_64-linux-gnu-
+CROSS_COMPILE := 
 CC := gcc
 COMPILER := $(CROSS_COMPILE)$(CC)
 
