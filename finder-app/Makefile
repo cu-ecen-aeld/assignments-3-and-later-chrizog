@@ -9,3 +9,4 @@ clean:
 		@if [ -e writer ]; then \
 			rm writer; \
 		fi
+all: clean writer
