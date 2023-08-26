@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if ! [ $# -eq 2 ]; then
     echo "Number of input arguments must be 2!"
