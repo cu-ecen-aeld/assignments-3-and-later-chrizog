@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(9000);
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_address.sin_addr.s_addr = inet_addr("0.0.0.0");
 
     if (bind(server_socket_fd, (struct sockaddr *)&server_address, sizeof(struct sockaddr_in)) < 0)
     {
@@ -173,9 +173,10 @@ int main(int argc, char *argv[])
         while (1 && !signal_received) // Receive loop
         {
             // Receive data from the client
-            memset(rcv_buffer, 0, sizeof(rcv_buffer));
+            memset(rcv_buffer, 0, sizeof(rcv_buffer) - 1);
+            rcv_buffer[sizeof(rcv_buffer) - 1] = '\0';
             syslog(LOG_USER, "Receive data.");
-            num_bytes = recv(client_socket_fd, rcv_buffer, sizeof(rcv_buffer), 0);
+            num_bytes = recv(client_socket_fd, rcv_buffer, sizeof(rcv_buffer) - 1, 0);
             if (num_bytes == -1)
             {
                 syslog(LOG_ERR, "recv error.");
@@ -213,8 +214,8 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    syslog(LOG_USER, "Found a new line character -> Write and send back data.");
                     size_t length_to_write = pointer_newline - rcv_buffer;
+                    syslog(LOG_USER, "Found a new line character at position: %ld -> Write and send back data.", length_to_write);
                     size_t new_arraysize = current_data_size + length_to_write;
                     char *extended_data_to_write = (char *)realloc(data_to_write, new_arraysize);
                     if (extended_data_to_write == NULL)
@@ -227,16 +228,13 @@ int main(int argc, char *argv[])
                     data_to_write = extended_data_to_write;
                     strncpy(data_to_write + current_data_size, (const char *)&rcv_buffer, length_to_write);
                     current_data_size = new_arraysize;
-
                     if (-1 == append_data_to_file(data_to_write, current_data_size))
                     {
                         syslog(LOG_ERR, "Writing to file failed.");
                         return -1;
                     }
-
                     free(data_to_write);
                     current_data_size = 0;
-
                     if (-1 == read_file_and_send_back(client_socket_fd))
                     {
                         syslog(LOG_ERR, "Sending back file content failed.");
