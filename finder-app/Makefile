@@ -6,4 +6,4 @@ writer:	writer.c
 		$(COMPILER) -o writer writer.c
 
 clean:	
-		rm writer
+		rm -f writer
